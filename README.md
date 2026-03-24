@@ -189,8 +189,6 @@ lib/
 ## License
 
 This project is created for educational purposes.
-developer raghavendra singh 
-           Aayush bhawadwaj
-           rishikesh singh
+developer raghavendra singh , Ayush bhradwaj , rishikesh singh
 
 
