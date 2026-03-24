@@ -189,7 +189,8 @@ lib/
 ## License
 
 This project is created for educational purposes.
+developer raghavendra singh 
+           Aayush bhawadwaj
+           rishikesh singh
 
-tanay raj and aviral trivedi
 
-Edited by Raghavendra Badsahh
