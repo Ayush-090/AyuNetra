@@ -1,78 +1,625 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="AyuNetra">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>AyuNetra</title>
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Splash screen styles -->
-  <style>
-    body {
-      background-color: #0c1f15; /* Constants.backgroundDark */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: #13EC92; /* Constants.primaryColor */
-      font-family: 'Poppins', sans-serif;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 2rem;
-    }
-    h1 {
-      margin-bottom: 2rem;
-    }
-    .loader {
-      border: 4px solid rgba(19, 236, 146, 0.2);
-      border-top: 4px solid #13EC92;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AyuNetra - Smart AI Medical Data & Prescription Intelligence Platform</title>
+  <meta name="description" content="AyuNetra is an advanced AI-powered medical platform that converts handwritten prescriptions into clear, plain-English patient briefings with audio speech synthesis and secure doctor-patient access delegation.">
+  
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div id="loading" class="center-content">
-    <h1>AyuNetra</h1>
-    <p>Your Health Companion</p>
-    <div class="loader"></div>
-    <p>Loading...</p>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <i class="fa-solid fa-eye"></i>
+        <span>AyuNetra</span>
+        <span class="brand-badge">AI MEDICAL</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#faq" class="nav-link">FAQ</a></li>
+        <li><a href="#portal" class="nav-link" onclick="switchTab('scanner-tab')"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Scanner</a></li>
+        <li><a href="#portal" class="nav-link" onclick="switchTab('patient-tab')">Patient Hub</a></li>
+        <li><a href="#portal" class="nav-link" onclick="switchTab('doctor-tab')">Doctor Hub</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div id="auth-guest-view">
+          <button class="btn btn-secondary btn-sm" onclick="openAuthModal('patient')">
+            <i class="fa-solid fa-user"></i> Patient Sign In
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openAuthModal('doctor')">
+            <i class="fa-solid fa-user-doctor"></i> Doctor Portal
+          </button>
+        </div>
+
+        <div id="auth-user-view" style="display: none;">
+          <div class="user-profile-badge">
+            <div class="avatar-circle" id="user-avatar-initials">P</div>
+            <div style="line-height: 1.1;">
+              <div id="user-display-name" style="font-weight: 600; font-size: 0.85rem;">Patient User</div>
+              <div id="user-display-role" style="font-size: 0.72rem; color: var(--primary);">Patient</div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="padding: 0.25rem 0.6rem;" onclick="logoutUser()">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- LANDING PAGE HERO SECTION -->
+  <header class="hero-section" id="hero">
+    <div class="container">
+      <div class="hero-pill">
+        <i class="fa-solid fa-sparkles"></i> AI-Powered Prescription Intelligence Platform
+      </div>
+      <h1 class="hero-title">Transform Handwritten Prescriptions Into <span class="gradient-text">Clear AI Patient Briefings</span></h1>
+      <p class="hero-description">
+        AyuNetra seamlessly bridges patients and healthcare providers. Upload handwritten doctor notes or lab reports, extract precise medication dosages with instant OCR, and listen to plain-English voice briefings.
+      </p>
+
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="scrollToPortal('scanner-tab')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Launch Interactive AI Scanner
+        </button>
+        <button class="btn btn-secondary" onclick="scrollToPortal('patient-tab')">
+          <i class="fa-solid fa-notes-medical"></i> Explore Patient Dashboard
+        </button>
+      </div>
+
+      <!-- Hero Banner Image Showcase -->
+      <div class="hero-showcase-wrapper">
+        <img src="assets/hero_preview.png" alt="AyuNetra AI Interface" class="hero-showcase-image">
+      </div>
+
+      <!-- Key Platform Statistics -->
+      <div class="stats-grid" style="margin-top: 3.5rem;">
+        <div class="stat-card">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">On-Device / AI OCR Parsing</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Dual Auth</div>
+          <div class="stat-label">Patient & Doctor Access</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Cloud Sync</div>
+          <div class="stat-label">Secure Supabase Storage</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Voice Brief</div>
+          <div class="stat-label">Speech Synthesis Audio</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- FEATURES SECTION -->
+  <section class="section-padding" id="features">
+    <div class="container">
+      <div class="section-title">
+        <h2>Engineered for <span class="gradient-text">Complete Medical Clarity</span></h2>
+        <p>AyuNetra combines state-of-the-art text recognition, generative summaries, and secure delegation into a single unified health companion.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.8rem;">
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-microscope"></i>
+          </div>
+          <h3>AI Prescription OCR</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            Automatically converts handwritten or printed doctor notes into structured drug lists, dosages, and daily schedules.
+          </p>
+        </div>
+
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <h3>Voice Speech Briefings</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            Reads prescription briefings aloud in plain English, ensuring elderly or visually impaired patients never miss dosage instructions.
+          </p>
+        </div>
+
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h3>Doctor-Patient Delegation</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            Grant temporary or permanent view access to verified doctors using registration numbers or email invitations.
+          </p>
+        </div>
+
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <h3>Supabase Cloud Vault</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            All prescriptions and lab diagnostic reports are encrypted and synchronized across web and mobile devices.
+          </p>
+        </div>
+
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-notes-medical"></i>
+          </div>
+          <h3>Lab & Diagnostics Hub</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            Categorize records between regular prescriptions and laboratory diagnostic reports with instant full-text search.
+          </p>
+        </div>
+
+        <div class="feature-card-landing">
+          <div class="feature-icon-box">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h3>Dual Role Security</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.93rem;">
+            Dedicated patient and doctor authentication workflows enforcing row-level database security policies.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS SECTION -->
+  <section class="section-padding" id="how-it-works" style="background: rgba(15, 38, 28, 0.4); border-y: 1px solid var(--glass-border);">
+    <div class="container">
+      <div class="section-title">
+        <h2>How <span class="gradient-text">AyuNetra Works</span> in 4 Simple Steps</h2>
+        <p>From paper prescription to intelligent digital health record in seconds.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4 style="margin-top: 0.75rem; margin-bottom: 0.4rem;">Snap or Upload</h4>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Take a photo of any prescription paper or upload a lab report image file.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4 style="margin-top: 0.75rem; margin-bottom: 0.4rem;">AI Text Extraction</h4>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Our AI OCR scans the document to parse drug names, dosages, and medical instructions.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4 style="margin-top: 0.75rem; margin-bottom: 0.4rem;">Listen or Read Brief</h4>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Get a simple, jargon-free summary or tap to listen to the audio voice briefing.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h4 style="margin-top: 0.75rem; margin-bottom: 0.4rem;">Share & Manage</h4>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Store permanently in your health dashboard or delegate secure access to your doctor.</p>
+        </div>
+      </div>
+
+      <!-- Feature Visual Feature Banner -->
+      <div style="margin-top: 4rem; text-align: center;">
+        <img src="assets/features_preview.png" alt="AyuNetra Doctor Tablet Interface" style="max-width: 900px; width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); box-shadow: 0 15px 40px rgba(0,0,0,0.5);">
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section class="section-padding" id="faq">
+    <div class="container">
+      <div class="section-title">
+        <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
+        <p>Everything you need to know about AyuNetra AI prescription reader.</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <span>How does the AI Prescription Scanner read handwritten doctor notes?</span>
+            <i class="fa-solid fa-chevron-down" style="color: var(--primary);"></i>
+          </div>
+          <div class="faq-answer">
+            AyuNetra uses specialized Optical Character Recognition (OCR) fine-tuned for medical prescriptions and pharmaceutical terminology to detect medicine names, dosages, frequencies, and specific instructions.
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <span>Is my personal medical data safe and private?</span>
+            <i class="fa-solid fa-chevron-down" style="color: var(--primary);"></i>
+          </div>
+          <div class="faq-answer">
+            Yes. AyuNetra implements Supabase Row Level Security (RLS). Your records can only be accessed by you and the specific doctors you explicitly authorize via access delegation.
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <span>Can doctors issue digital prescriptions directly on AyuNetra?</span>
+            <i class="fa-solid fa-chevron-down" style="color: var(--primary);"></i>
+          </div>
+          <div class="faq-answer">
+            Yes! Doctors can log in using their medical registration number, look up patients by ABHA ID or phone number, and issue structured digital prescriptions directly to the patient's dashboard.
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            <span>How does the voice audio briefing work?</span>
+            <i class="fa-solid fa-chevron-down" style="color: var(--primary);"></i>
+          </div>
+          <div class="faq-answer">
+            When you click "Listen to Audio Briefing", AyuNetra converts the plain-English AI summary into speech using web synthesis, making it easy for elderly or visually impaired patients to hear their medicine instructions.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGH IMPACT CTA SECTION -->
+  <div class="container">
+    <div class="cta-banner-card">
+      <h2 style="font-size: 2.4rem; margin-bottom: 1rem;">Ready to Experience Smart Medical Management?</h2>
+      <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 620px; margin: 0 auto 2rem;">
+        Start managing prescriptions, running instant AI OCR analyses, and organizing your health records today.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="scrollToPortal('scanner-tab')">
+          <i class="fa-solid fa-rocket"></i> Launch Web Application
+        </button>
+        <button class="btn btn-secondary" onclick="openAuthModal('doctor')">
+          <i class="fa-solid fa-user-doctor"></i> Doctor Sign In
+        </button>
+      </div>
+    </div>
   </div>
-  <script src="flutter_bootstrap.js" async></script>
+
+  <!-- INTERACTIVE WEB APPLICATION PORTAL -->
+  <main id="portal" class="section-padding" style="border-top: 1px solid var(--glass-border);">
+    <div class="container">
+      <div class="section-title">
+        <h2>Interactive <span class="gradient-text">AyuNetra Web Portal</span></h2>
+        <p>Access your Patient Dashboard, Doctor Hub, and AI Scanner live below.</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="app-tabs">
+        <button class="tab-btn active" id="tab-btn-scanner" onclick="switchTab('scanner-tab')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> AI Prescription Scanner
+        </button>
+        <button class="tab-btn" id="tab-btn-patient" onclick="switchTab('patient-tab')">
+          <i class="fa-solid fa-bed-pulse"></i> Patient Dashboard
+        </button>
+        <button class="tab-btn" id="tab-btn-doctor" onclick="switchTab('doctor-tab')">
+          <i class="fa-solid fa-user-doctor"></i> Doctor Portal
+        </button>
+        <button class="tab-btn" id="tab-btn-access" onclick="switchTab('access-tab')">
+          <i class="fa-solid fa-key"></i> Access Delegation
+        </button>
+      </div>
+
+      <!-- TAB 1: AI Prescription Scanner -->
+      <div id="scanner-tab" class="tab-content active">
+        <div class="glass-panel scanner-container">
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.8rem;">AI Prescription Reader & Patient Briefing</h2>
+            <p style="color: var(--text-muted); margin-top: 0.3rem;">Upload or drag a prescription photo below, or select a sample prescription to test instant OCR text extraction.</p>
+          </div>
+
+          <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+            <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+            <div class="dropzone-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Drop prescription image here or click to browse</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Supports JPG, PNG, WEBP prescription photos & lab reports</p>
+          </div>
+
+          <!-- Sample Prescription Selector -->
+          <div style="text-align: center; margin-top: 1.5rem;">
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.6rem;">OR QUICK TEST WITH A SAMPLE:</span>
+            <div class="sample-pills">
+              <button class="sample-pill" onclick="loadSamplePrescription('hypertension')">
+                <i class="fa-solid fa-heart-pulse"></i> Sample 1: Hypertension & BP
+              </button>
+              <button class="sample-pill" onclick="loadSamplePrescription('antibiotics')">
+                <i class="fa-solid fa-pills"></i> Sample 2: Antibiotics & Fever
+              </button>
+              <button class="sample-pill" onclick="loadSamplePrescription('diabetes')">
+                <i class="fa-solid fa-syringe"></i> Sample 3: Diabetes Management
+              </button>
+            </div>
+          </div>
+
+          <!-- OCR Results & AI Briefing Panel -->
+          <div class="glass-panel analysis-results-card" id="analysis-results-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> AI Analysis Complete</h3>
+              <button class="btn btn-secondary btn-sm" onclick="speakBriefing()">
+                <i class="fa-solid fa-volume-high"></i> Listen to Audio Briefing
+              </button>
+            </div>
+
+            <!-- Prescription Image Preview (If uploaded) -->
+            <div id="image-preview-container" style="display: none; margin-bottom: 1.5rem; text-align: center;">
+              <img id="prescription-img-preview" src="" alt="Prescription" style="max-height: 220px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            </div>
+
+            <div class="briefing-box">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-robot"></i> Patient-Friendly Briefing</h4>
+              <div id="ai-briefing-text" style="white-space: pre-line; line-height: 1.6; font-size: 0.95rem;">
+                Analyzing prescription...
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+              <div style="background: var(--card-dark); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+                <h4 style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="fa-solid fa-capsules" style="color: var(--primary);"></i> Extracted Medications</h4>
+                <ul id="ai-medications-list" style="padding-left: 1.2rem; font-size: 0.9rem;"></ul>
+              </div>
+              <div style="background: var(--card-dark); padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+                <h4 style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="fa-solid fa-clock" style="color: var(--warning);"></i> Dosage & Schedule</h4>
+                <p id="ai-dosage-text" style="font-size: 0.9rem;"></p>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button class="btn btn-primary btn-sm" onclick="saveScannedPrescription()">
+                <i class="fa-solid fa-bookmark"></i> Save to Patient Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Patient Dashboard -->
+      <div id="patient-tab" class="tab-content">
+        <div class="dashboard-header">
+          <div>
+            <h2>Patient Medical Records</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">View your prescriptions, lab reports, and AI briefings.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="openAddPrescriptionModal()">
+              <i class="fa-solid fa-plus"></i> Add Manual Prescription
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="search-filter-box">
+          <div class="search-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="patient-search-input" class="form-control" placeholder="Search by medication, doctor name, or diagnosis..." oninput="filterPatientRecords()">
+          </div>
+          <select id="patient-type-filter" class="form-control select-control" onchange="filterPatientRecords()">
+            <option value="all">All Records</option>
+            <option value="prescription">Prescriptions</option>
+            <option value="lab_report">Lab Reports</option>
+          </select>
+        </div>
+
+        <!-- Records Grid -->
+        <div class="cards-grid" id="patient-records-grid">
+          <!-- Dynamically rendered cards -->
+        </div>
+      </div>
+
+      <!-- TAB 3: Doctor Portal -->
+      <div id="doctor-tab" class="tab-content">
+        <div class="dashboard-header">
+          <div>
+            <h2>Doctor Consultation & Prescriptions Portal</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Search patients, review medical history, and issue digital prescriptions.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="openAddPrescriptionModal()">
+              <i class="fa-solid fa-file-signature"></i> Create Digital Prescription
+            </button>
+          </div>
+        </div>
+
+        <!-- Patient Lookup Box -->
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-id-card" style="color: var(--primary);"></i> Patient Lookup by ABHA ID / Phone / Name</h3>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <input type="text" id="doctor-patient-search" class="form-control" style="flex: 1;" placeholder="Enter Patient Name, ABHA ID or Mobile Number...">
+            <button class="btn btn-primary" onclick="searchPatientByDoctor()">
+              <i class="fa-solid fa-search"></i> Search Patient
+            </button>
+          </div>
+          <div id="doctor-search-result" style="margin-top: 1rem; display: none;"></div>
+        </div>
+
+        <!-- Doctor Prescriptions List -->
+        <h3 style="margin-bottom: 1rem;">Prescriptions Issued by You</h3>
+        <div class="cards-grid" id="doctor-prescriptions-grid">
+          <!-- Dynamically rendered cards -->
+        </div>
+      </div>
+
+      <!-- TAB 4: Access Delegation -->
+      <div id="access-tab" class="tab-content">
+        <div class="dashboard-header">
+          <div>
+            <h2>Doctor Access Management</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Grant temporary or permanent permission to doctors to access your medical records.</p>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1rem;"><i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> Grant Access to Doctor</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Doctor Registration Number or Email</label>
+            <input type="text" id="grant-doctor-id" class="form-control" placeholder="e.g. DOC-98745 or dr.sharma@ayunetra.doctor">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Permission Level</label>
+            <select id="grant-access-level" class="form-control select-control">
+              <option value="view_only">Full View Access (Read Only)</option>
+              <option value="add_records">Full View + Add Prescriptions</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" onclick="grantDoctorAccess()">
+            <i class="fa-solid fa-key"></i> Grant Access Permission
+          </button>
+
+          <h3 style="font-size: 1.1rem; margin-top: 2.5rem; margin-bottom: 1rem;">Currently Authorized Doctors</h3>
+          <div id="authorized-doctors-list">
+            <div style="background: var(--card-dark); padding: 1rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div>
+                <div style="font-weight: 600;">Dr. Rajesh Sharma (Cardiologist)</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Reg: DOC-98745 | Access Granted: Full View</div>
+              </div>
+              <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: rgba(255, 82, 82, 0.3);" onclick="revokeDoctorAccess('DOC-98745')">
+                Revoke
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="auth-modal-title"><i class="fa-solid fa-lock" style="color: var(--primary);"></i> Sign In</h3>
+        <button class="close-btn" onclick="closeModal('auth-modal')">&times;</button>
+      </div>
+
+      <div class="app-tabs" style="margin: 0 0 1.5rem 0;">
+        <button class="tab-btn active" id="auth-role-patient" onclick="setAuthRole('patient')">
+          <i class="fa-solid fa-user"></i> Patient
+        </button>
+        <button class="tab-btn" id="auth-role-doctor" onclick="setAuthRole('doctor')">
+          <i class="fa-solid fa-user-doctor"></i> Doctor
+        </button>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div class="form-group" id="doctor-reg-group" style="display: none;">
+          <label class="form-label">Doctor Registration Number</label>
+          <input type="text" id="auth-doc-reg" class="form-control" placeholder="e.g. DOC-12345">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="auth-email" class="form-control" required placeholder="name@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="auth-password" class="form-control" required placeholder="••••••••">
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleAuthMode()">Switch to <span id="auth-switch-label">Sign Up</span></button>
+          <button type="submit" class="btn btn-primary" id="auth-submit-btn">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD PRESCRIPTION MODAL -->
+  <div class="modal-backdrop" id="add-prescription-modal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-medical" style="color: var(--primary);"></i> Add Medical Prescription</h3>
+        <button class="close-btn" onclick="closeModal('add-prescription-modal')">&times;</button>
+      </div>
+
+      <form onsubmit="handleSaveManualPrescription(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Patient Name</label>
+            <input type="text" id="form-patient-name" class="form-control" required placeholder="e.g. Ayush Bhardwaj">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Age & Gender</label>
+            <input type="text" id="form-patient-age" class="form-control" placeholder="e.g. 28 Yrs, Male">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Blood Pressure</label>
+            <input type="text" id="form-bp" class="form-control" placeholder="e.g. 120/80 mmHg">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Record Type</label>
+            <select id="form-record-type" class="form-control select-control">
+              <option value="prescription">Prescription</option>
+              <option value="lab_report">Lab Report</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Medications (Comma-separated)</label>
+          <input type="text" id="form-medications" class="form-control" placeholder="e.g. Amoxicillin 500mg, Paracetamol 650mg">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dosage & Frequency</label>
+          <input type="text" id="form-dosage" class="form-control" placeholder="e.g. 1 Tablet Twice Daily After Meals for 5 Days">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Special Instructions & Doctor Notes</label>
+          <textarea id="form-instructions" class="form-control" style="height: 90px; padding-left: 1.2rem;" placeholder="e.g. Drink plenty of warm water. Avoid cold beverages..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('add-prescription-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Prescription</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW DETAIL MODAL -->
+  <div class="modal-backdrop" id="detail-modal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="detail-title">Prescription Details</h3>
+        <button class="close-btn" onclick="closeModal('detail-modal')">&times;</button>
+      </div>
+      <div id="detail-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p style="margin-bottom: 0.5rem; font-weight: 600; color: #fff;">AyuNetra - Smart Medical AI Prescription Platform</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Developed by Raghavendra Singh, Ayush Bhardwaj, and Rishikesh Singh.</p>
+      <p style="font-size: 0.78rem; color: var(--text-dim);">&copy; 2026 AyuNetra. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
